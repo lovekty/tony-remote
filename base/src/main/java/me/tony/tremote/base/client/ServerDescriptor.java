@@ -2,9 +2,11 @@ package me.tony.tremote.base.client;
 
 public interface ServerDescriptor {
 
-    int getHost();
+    String getHost();
 
     int getPort();
 
-    int getTypeId();
+    String getProtocol();
+
+    String getTransportType();
 }

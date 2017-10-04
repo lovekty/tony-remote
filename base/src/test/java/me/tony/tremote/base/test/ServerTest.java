@@ -6,6 +6,7 @@ import me.tony.tremote.base.server.Server;
 import me.tony.tremote.base.test.gen.DemoService;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
@@ -69,5 +70,6 @@ public class ServerTest {
         transport.open();
         DemoService.Client client = new DemoService.Client(new TBinaryProtocol(transport));
         System.out.println(client.getName("Tony"));
+
     }
 }
