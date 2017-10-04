@@ -55,7 +55,7 @@ public abstract class AbstractServerFactory implements ServerFactory {
     private TServer.AbstractServerArgs createArgs(ServerConfig config, TServerTransport transport) {
         Class<? extends TServer.AbstractServerArgs> argsClass = config.getServerType().getArgsClass();
         try {
-            TServer.AbstractServerArgs args = BeanUtils.instantiateClass(argsClass.getConstructor(TServerTransport.class), transport);
+            TServer.AbstractServerArgs args = BeanUtils.instantiateClass(argsClass.getConstructor(config.getServerType().getArgsConstructorParameters()), transport);
             args.protocolFactory(createProtocalFactory(config.getProtocol().getProtocolType().getFactoryClass()));
             fillConfig(args, config);
             return args;

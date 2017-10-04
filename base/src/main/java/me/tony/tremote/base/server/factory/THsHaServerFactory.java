@@ -1,6 +1,7 @@
 package me.tony.tremote.base.server.factory;
 
-import me.tony.base.thrift.spring.config.server.ServerConfig;
+
+import me.tony.tremote.base.config.server.ServerConfig;
 
 public class THsHaServerFactory extends AbstractServerFactory {
     @Override

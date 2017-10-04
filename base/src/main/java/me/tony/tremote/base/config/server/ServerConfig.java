@@ -3,6 +3,7 @@ package me.tony.tremote.base.config.server;
 import me.tony.tremote.base.config.protocol.ProtocolConfig;
 import org.apache.thrift.server.*;
 import org.apache.thrift.transport.TNonblockingServerSocket;
+import org.apache.thrift.transport.TNonblockingServerTransport;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 
@@ -48,24 +49,27 @@ public class ServerConfig implements Serializable {
     }
 
     public enum ServerType {
-        SIMPLE(1, TSimpleServer.class, TServer.Args.class, TServerSocket.class),
-        NONBLOCKING(2, TNonblockingServer.class, TNonblockingServer.Args.class, TNonblockingServerSocket.class),
-        HSHA(3, THsHaServer.class, THsHaServer.Args.class, TNonblockingServerSocket.class),
-        SELECTOR(4, TThreadedSelectorServer.class, TThreadedSelectorServer.Args.class, TNonblockingServerSocket.class),
-        POOL(5, TThreadPoolServer.class, TThreadPoolServer.Args.class, TServerSocket.class);
+        SIMPLE(1, TSimpleServer.class, TServer.Args.class, new Class[]{TServerTransport.class}, TServerSocket.class),
+        NONBLOCKING(2, TNonblockingServer.class, TNonblockingServer.Args.class, new Class[]{TNonblockingServerTransport.class}, TNonblockingServerSocket.class),
+        HSHA(3, THsHaServer.class, THsHaServer.Args.class, new Class[]{TNonblockingServerTransport.class}, TNonblockingServerSocket.class),
+        SELECTOR(4, TThreadedSelectorServer.class, TThreadedSelectorServer.Args.class, new Class[]{TNonblockingServerTransport.class}, TNonblockingServerSocket.class),
+        POOL(5, TThreadPoolServer.class, TThreadPoolServer.Args.class, new Class[]{TServerTransport.class}, TServerSocket.class);
 
         private int id;
         private Class<? extends TServer> serverClass;
         private Class<? extends TServer.AbstractServerArgs> argsClass;
+        private Class<?>[] argsConstructorParameters;
         private Class<? extends TServerTransport> transportClass;
 
         ServerType(int id,
                    Class<? extends TServer> serverClass,
                    Class<? extends TServer.AbstractServerArgs> argsClass,
+                   Class<?>[] argsConstructorParameters,
                    Class<? extends TServerTransport> transportClass) {
             this.id = id;
             this.serverClass = serverClass;
             this.argsClass = argsClass;
+            this.argsConstructorParameters = argsConstructorParameters;
             this.transportClass = transportClass;
         }
 
@@ -79,6 +83,10 @@ public class ServerConfig implements Serializable {
 
         public Class<? extends TServer.AbstractServerArgs> getArgsClass() {
             return argsClass;
+        }
+
+        public Class<?>[] getArgsConstructorParameters() {
+            return argsConstructorParameters;
         }
 
         public Class<? extends TServerTransport> getTransportClass() {
