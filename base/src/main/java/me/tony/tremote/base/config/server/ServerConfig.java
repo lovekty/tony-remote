@@ -49,27 +49,40 @@ public class ServerConfig implements Serializable {
     }
 
     public enum ServerType {
-        SIMPLE(1, TSimpleServer.class, TServer.Args.class, new Class[]{TServerTransport.class}, TServerSocket.class),
-        NONBLOCKING(2, TNonblockingServer.class, TNonblockingServer.Args.class, new Class[]{TNonblockingServerTransport.class}, TNonblockingServerSocket.class),
-        HSHA(3, THsHaServer.class, THsHaServer.Args.class, new Class[]{TNonblockingServerTransport.class}, TNonblockingServerSocket.class),
-        SELECTOR(4, TThreadedSelectorServer.class, TThreadedSelectorServer.Args.class, new Class[]{TNonblockingServerTransport.class}, TNonblockingServerSocket.class),
-        POOL(5, TThreadPoolServer.class, TThreadPoolServer.Args.class, new Class[]{TServerTransport.class}, TServerSocket.class);
+        SIMPLE(1, TSimpleServer.class, TServer.AbstractServerArgs.class,
+                TServer.Args.class, TServerTransport.class,
+                TServerSocket.class),
+        NONBLOCKING(2, TNonblockingServer.class, AbstractNonblockingServer.AbstractNonblockingServerArgs.class,
+                TNonblockingServer.Args.class, TNonblockingServerTransport.class,
+                TNonblockingServerSocket.class),
+        HSHA(3, THsHaServer.class, THsHaServer.Args.class,
+                THsHaServer.Args.class, TNonblockingServerTransport.class,
+                TNonblockingServerSocket.class),
+        SELECTOR(4, TThreadedSelectorServer.class, TThreadedSelectorServer.Args.class,
+                TThreadedSelectorServer.Args.class, TNonblockingServerTransport.class,
+                TNonblockingServerSocket.class),
+        POOL(5, TThreadPoolServer.class, TThreadPoolServer.Args.class,
+                TThreadPoolServer.Args.class, TServerTransport.class,
+                TServerSocket.class);
 
         private int id;
         private Class<? extends TServer> serverClass;
+        private Class<?> serverConstructorParameter;
         private Class<? extends TServer.AbstractServerArgs> argsClass;
-        private Class<?>[] argsConstructorParameters;
+        private Class<?> argsConstructorParameter;
         private Class<? extends TServerTransport> transportClass;
 
         ServerType(int id,
                    Class<? extends TServer> serverClass,
+                   Class<?> serverConstructorParameter,
                    Class<? extends TServer.AbstractServerArgs> argsClass,
-                   Class<?>[] argsConstructorParameters,
+                   Class<?> argsConstructorParameter,
                    Class<? extends TServerTransport> transportClass) {
             this.id = id;
             this.serverClass = serverClass;
+            this.serverConstructorParameter = serverConstructorParameter;
             this.argsClass = argsClass;
-            this.argsConstructorParameters = argsConstructorParameters;
+            this.argsConstructorParameter = argsConstructorParameter;
             this.transportClass = transportClass;
         }
 
@@ -81,12 +94,16 @@ public class ServerConfig implements Serializable {
             return serverClass;
         }
 
+        public Class<?> getServerConstructorParameter() {
+            return serverConstructorParameter;
+        }
+
         public Class<? extends TServer.AbstractServerArgs> getArgsClass() {
             return argsClass;
         }
 
-        public Class<?>[] getArgsConstructorParameters() {
-            return argsConstructorParameters;
+        public Class<?> getArgsConstructorParameter() {
+            return argsConstructorParameter;
         }
 
         public Class<? extends TServerTransport> getTransportClass() {

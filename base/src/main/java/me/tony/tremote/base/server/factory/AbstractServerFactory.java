@@ -36,9 +36,9 @@ public abstract class AbstractServerFactory implements ServerFactory {
 
     private TServer createServer(ServerConfig config, TServer.AbstractServerArgs args) {
         Class<? extends TServer> serverClass = config.getServerType().getServerClass();
-        Class<? extends TServer.AbstractServerArgs> argsClass = config.getServerType().getArgsClass();
+        Class<?> parameterClass = config.getServerType().getServerConstructorParameter();
         try {
-            return BeanUtils.instantiateClass(serverClass.getConstructor(argsClass), args);
+            return BeanUtils.instantiateClass(serverClass.getConstructor(parameterClass), args);
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("cannot find target constructor for " + serverClass.getName(), e);
         }
@@ -55,7 +55,7 @@ public abstract class AbstractServerFactory implements ServerFactory {
     private TServer.AbstractServerArgs createArgs(ServerConfig config, TServerTransport transport) {
         Class<? extends TServer.AbstractServerArgs> argsClass = config.getServerType().getArgsClass();
         try {
-            TServer.AbstractServerArgs args = BeanUtils.instantiateClass(argsClass.getConstructor(config.getServerType().getArgsConstructorParameters()), transport);
+            TServer.AbstractServerArgs args = BeanUtils.instantiateClass(argsClass.getConstructor(config.getServerType().getArgsConstructorParameter()), transport);
             args.protocolFactory(createProtocalFactory(config.getProtocol().getProtocolType().getFactoryClass()));
             fillConfig(args, config);
             return args;
