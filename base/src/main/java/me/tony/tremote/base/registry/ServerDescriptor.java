@@ -1,4 +1,4 @@
-package me.tony.tremote.base.client;
+package me.tony.tremote.base.registry;
 
 public interface ServerDescriptor {
 
@@ -9,4 +9,5 @@ public interface ServerDescriptor {
     String getProtocol();
 
     String getTransportType();
+
 }
