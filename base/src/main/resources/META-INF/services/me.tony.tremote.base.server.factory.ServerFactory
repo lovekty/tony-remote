@@ -1,5 +1,0 @@
-me.tony.tremote.base.server.factory.TSimpleServerFactory
-me.tony.tremote.base.server.factory.TThreadedSelectorServerFactory
-me.tony.tremote.base.server.factory.THsHaServerFactory
-me.tony.tremote.base.server.factory.TNonblockingServerFactory
-me.tony.tremote.base.server.factory.TThreadPoolServerFactory
