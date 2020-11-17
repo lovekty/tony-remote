@@ -2,53 +2,37 @@ package me.tonyirl.tremote.core;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.x.discovery.ServiceDiscovery;
-import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
-import org.apache.curator.x.discovery.ServiceInstance;
-import org.apache.curator.x.discovery.ServiceProvider;
-import org.apache.thrift.transport.TNonblockingSocket;
-import org.apache.thrift.transport.TTransport;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.lang.reflect.Proxy;
 
 /**
  * @author tony.zhuby
  * @date 2020/5/21
  */
-public class ClientProxy<T> implements InvocationHandler {
+public class ClientProxy<Iface> implements InvocationHandler {
 
-    private final Class<T> ifaceType;
-    private final ServiceInfo serviceInfo;
-    private final Class<?> serviceType;
-    private final ServiceProvider<ServiceInfo> provider;
-    private final Map<String, T> map = new ConcurrentHashMap<>();
+    private final Class<Iface> ifaceType;
+    private final ClientHolder<Iface> holder;
 
     @SneakyThrows
-    public ClientProxy(@NonNull Class<T> ifaceType, @NonNull ServiceInfo serviceInfo, @NonNull CuratorFramework zk) {
+    public ClientProxy(@NonNull Class<Iface> ifaceType, @NonNull ClientHolder<Iface> holder) {
+        if (!ifaceType.isInterface()) {
+            throw new RuntimeException("iface must be an interface! got: " + ifaceType.getName());
+        }
+        this.holder = holder;
         this.ifaceType = ifaceType;
-        this.serviceInfo = serviceInfo;
-        this.serviceType = ThriftHelper.serviceFromIfaceType(ifaceType);
-        ServiceDiscovery<ServiceInfo> discovery = ServiceDiscoveryBuilder.builder(ServiceInfo.class).basePath("/tremote-services").client(zk).build();
-        discovery.start();
-        this.provider = discovery.serviceProviderBuilder().serviceName(serviceInfo.getName()).build();
-        provider.start();
     }
 
-    private T createClient(ServiceInstance<ServiceInfo> si) {
-        String address = si.getAddress();
-        int port = si.getPort();
-        TTransport transport = new TNonblockingSocket(address, port);
-        new
+
+    public final Iface getProxyInstance() {
+        return ifaceType.cast(Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[]{ifaceType}, this));
     }
 
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        method.invoke(proxy, args);
-        return null;
+        return method.invoke(holder.getClient(), args);
     }
 }

@@ -19,7 +19,7 @@ public class ThriftHelper {
     public static final String CLIENT_FACTORY_SUFFIX = "$Client$Factory";
     private static final ClassLoader CL = ThriftHelper.class.getClassLoader();
 
-    public Class<?> ifaceFromServiceType(@NonNull Class<?> serviceType) {
+    public Class<?> ifaceFromService(@NonNull Class<?> serviceType) {
         String ifaceTypeName = serviceType.getName() + IFACE_SUFFIX;
         try {
             return CL.loadClass(ifaceTypeName);
@@ -28,7 +28,7 @@ public class ThriftHelper {
         }
     }
 
-    public Class<?> serviceFromIfaceType(@NonNull Class<?> ifaceType) {
+    public Class<?> serviceFromIface(@NonNull Class<?> ifaceType) {
         String ifaceTypeName = ifaceType.getName();
         if (!ifaceTypeName.endsWith(IFACE_SUFFIX)) {
             throw new IllegalArgumentException(String.format("%s is not a thrift iface!", ifaceType.getName()));
@@ -41,7 +41,7 @@ public class ThriftHelper {
         }
     }
 
-    public Class<? extends TProcessor> processorFromServiceType(@NonNull Class<?> serviceType) {
+    public Class<? extends TProcessor> processorFromService(@NonNull Class<?> serviceType) {
         String processorTypeName = serviceType.getName() + PROCESSOR_SUFFIX;
         try {
             Class<?> clazz = CL.loadClass(processorTypeName);
@@ -54,19 +54,19 @@ public class ThriftHelper {
         }
     }
 
-    public Class<?> ifaceFromService(@NonNull Object service) {
-        Class<?> serviceType = service.getClass();
+    public Class<?> ifaceFromServiceInstance(@NonNull Object instance) {
+        Class<?> serviceType = instance.getClass();
         Class<?>[] interfaces = serviceType.getInterfaces();
         for (Class<?> i : interfaces) {
             if (i.getName().endsWith(IFACE_SUFFIX)) {
                 return i;
             }
         }
-        throw new IllegalArgumentException(String.format("%s is not a thrift iface!", service.getClass().getName()));
+        throw new IllegalArgumentException(String.format("%s is not a thrift iface!", instance.getClass().getName()));
     }
 
-    public Class<?> serviceTypeFromService(Object provider) {
-        Class<?> providerType = provider.getClass();
+    public Class<?> serviceFromServiceInstance(@NonNull Object instance) {
+        Class<?> providerType = instance.getClass();
         Class<?>[] interfaces = providerType.getInterfaces();
         for (Class<?> i : interfaces) {
             if (i.getName().endsWith(IFACE_SUFFIX)) {
@@ -78,10 +78,10 @@ public class ThriftHelper {
                 }
             }
         }
-        throw new IllegalArgumentException(String.format("%s is not a thrift iface!", provider.getClass().getName()));
+        throw new IllegalArgumentException(String.format("%s is not a thrift iface!", instance.getClass().getName()));
     }
 
-    public Class<? extends TServiceClient> clientFromServiceType(Class<?> serviceType) {
+    public Class<? extends TServiceClient> clientFromService(@NonNull Class<?> serviceType) {
         String clientTypeName = serviceType.getName() + CLIENT_SUFFIX;
         try {
             Class<?> clazz = CL.loadClass(clientTypeName);
@@ -94,11 +94,11 @@ public class ThriftHelper {
         }
     }
 
-    public Class<? extends TServiceClientFactory<?>> clientFactoryFromService(Class<?> serviceType) {
+    public Class<? extends TServiceClientFactory<?>> clientFactoryFromService(@NonNull Class<?> serviceType) {
         String clientFactoryTypeName = serviceType.getName() + CLIENT_FACTORY_SUFFIX;
         try {
             Class<?> clazz = CL.loadClass(clientFactoryTypeName);
-            if (TServiceClient.class.isAssignableFrom(clazz)) {
+            if (TServiceClientFactory.class.isAssignableFrom(clazz)) {
                 return (Class<? extends TServiceClientFactory<?>>) clazz;
             }
             throw new IllegalArgumentException(String.format("%s is not a TServiceClientFactory", clientFactoryTypeName));
