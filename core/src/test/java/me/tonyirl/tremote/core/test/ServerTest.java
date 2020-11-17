@@ -29,7 +29,7 @@ public class ServerTest {
     }
 
     public static void main(String[] args) throws Exception {
-        CuratorFramework zk = CuratorFrameworkFactory.builder().connectString("127.0.0.1:2181")
+        CuratorFramework zk = CuratorFrameworkFactory.builder().connectString(System.getProperty("zkurl", "127.0.0.1:2181"))
                 .sessionTimeoutMs(5000)
                 .connectionTimeoutMs(5000)
                 .retryPolicy(new ExponentialBackoffRetry(1000, 3))
