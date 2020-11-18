@@ -1,0 +1,3 @@
+# tony-remote
+microservice framework based on thrift and curator service discovery.
+it works now. just works...
